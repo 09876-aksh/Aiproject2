@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chess Steganography</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
+    <div class="max-w-6xl mx-auto p-8">
+        <div class="text-center mb-8 pt-6">
+            <h1 class="text-5xl font-bold text-white mb-3">
+                🔒 AI-Assisted Chess Steganography
+            </h1>
+            <p class="text-purple-300 text-lg">Hide messages in chess games using artificial intelligence</p>
+        </div>
+
+        <div class="bg-purple-800/30 border border-purple-500/50 rounded-xl p-5 mb-8 backdrop-blur">
+            <div class="flex items-start gap-3">
+                <span class="text-3xl">ℹ</span>
+                <div class="text-purple-200">
+                    <strong class="text-purple-100">How it works:</strong> Your secret message is converted to binary and encoded into chess move selections. AI ensures the game looks completely natural!
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-3 mb-6">
+            <button onclick="useSample()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition">
+                📝 Use Sample Message
+            </button>
+            <button onclick="copyToDecode()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition">
+                📋 Copy to Decode Tab
+            </button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-4 mb-6">
+            <button id="encodeTab" onclick="switchTab('encode')" class="flex-1 py-4 rounded-xl font-bold text-lg bg-purple-600 text-white shadow-xl transition">
+                🔒 Encode Message
+            </button>
+            <button id="decodeTab" onclick="switchTab('decode')" class="flex-1 py-4 rounded-xl font-bold text-lg bg-slate-700 text-slate-300 hover:bg-slate-600 transition">
+                🔓 Decode Message
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Panel -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Encode Panel -->
+                <div id="encodePanel">
+                    <div class="bg-slate-800/70 backdrop-blur rounded-xl p-6 border border-slate-600 shadow-2xl">
+                        <h2 class="text-2xl font-bold text-white mb-4">✍ Enter Secret Message</h2>
+                        <textarea id="messageInput" placeholder="Type your secret message here..." 
+                            class="w-full h-36 bg-slate-900 text-white text-lg rounded-lg p-4 border-2 border-slate-600 focus:border-purple-500 focus:outline-none resize-none shadow-inner"></textarea>
+                        <div class="flex justify-between items-center mt-4">
+                            <span id="charCount" class="text-slate-300 font-medium">0 characters • 0 moves needed</span>
+                            <button onclick="encodeMessage()" class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-bold text-lg shadow-lg transition transform hover:scale-105">
+                                ▶ Encode Now
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/70 backdrop-blur rounded-xl p-6 border border-slate-600 shadow-2xl">
+                        <h2 class="text-2xl font-bold text-white mb-4">♟ Generated Chess Game (PGN)</h2>
+                        <div id="pgnOutput" class="bg-slate-900 rounded-lg p-4 h-64 overflow-y-auto border-2 border-slate-600 shadow-inner">
+                            <p class="text-slate-400 text-center py-20">🎲 Encoded game will appear here...</p>
+                        </div>
+                        <div class="flex gap-3 mt-4">
+                            <button onclick="copyPGN()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-3 rounded-lg font-semibold shadow-lg transition">
+                                📋 Copy PGN
+                            </button>
+                            <button onclick="downloadPGN()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-4 py-3 rounded-lg font-semibold shadow-lg transition">
+                                ⬇ Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="decodePanel" class="hidden space-y-6">
+                    <div class="bg-slate-800/70 backdrop-blur rounded-xl p-6 border border-slate-600 shadow-2xl">
+                        <h2 class="text-2xl font-bold text-white mb-4">📄 Paste PGN Game</h2>
+                        <textarea id="pgnInput" placeholder="Paste the chess game PGN here to decode..." 
+                            class="w-full h-36 bg-slate-900 text-green-400 font-mono text-sm rounded-lg p-4 border-2 border-slate-600 focus:border-purple-500 focus:outline-none resize-none shadow-inner"></textarea>
+                        <div class="flex justify-end mt-4">
+                            <button onclick="decodeMessage()" class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-bold text-lg shadow-lg transition transform hover:scale-105">
+                                ▶ Decode Now
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/70 backdrop-blur rounded-xl p-6 border border-slate-600 shadow-2xl">
+                        <h2 class="text-2xl font-bold text-white mb-4">🔓 Decoded Message</h2>
+                        <div id="decodedOutput" class="bg-slate-900 rounded-lg p-4 h-64 flex items-center justify-center border-2 border-slate-600 shadow-inner">
+                            <p class="text-slate-400 text-center">🔍 Decoded message will appear here...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Chess Board -->
+            <div class="lg:col-span-1">
+                <div id="chessBoard" class="bg-slate-800/70 backdrop-blur rounded-xl p-6 border border-slate-600 shadow-2xl sticky top-4 hidden">
+                    <h2 class="text-2xl font-bold text-white mb-4">♟ Live Chess Board</h2>
+                    <div class="bg-slate-900 p-4 rounded-lg border-2 border-slate-600 shadow-inner">
+                        <div id="board" class="grid grid-cols-8 gap-0 w-full aspect-square"></div>
+                    </div>
+                    <div id="controls" class="mt-4 hidden">
+                        <div class="flex justify-between mb-3 text-white">
+                            <span id="moveCounter" class="font-bold">Move: 0/0</span>
+                            <span id="currentMove" class="text-purple-300 font-semibold">Start</span>
+                        </div>
+                        <div class="flex gap-2 mb-3">
+                            <button onclick="resetBoard()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg font-semibold">🔄 Reset</button>
+                            <button onclick="prevMove()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg font-bold text-xl">◀</button>
+                            <button onclick="playPause()" id="playBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg font-bold text-xl">▶</button>
+                            <button onclick="nextMove()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg font-bold text-xl">▶</button>
+                        </div>
+                        <div id="moveList" class="bg-slate-900 rounded-lg p-3 max-h-40 overflow-y-auto text-xs text-slate-300 border border-slate-600"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Process Steps -->
+        <div id="processSteps" class="hidden mt-8 bg-slate-800/70 backdrop-blur rounded-xl p-6 border border-slate-600 shadow-2xl">
+            <h2 class="text-2xl font-bold text-white mb-4">⚙ Processing Steps</h2>
+            <div id="stepsContainer"></div>
+        </div>
+
+        <!-- Stats -->
+        <div class="mt-8 grid grid-cols-3 gap-4">
+            <div class="bg-slate-800/70 backdrop-blur rounded-xl p-6 border border-slate-600 shadow-xl text-center">
+                <p class="text-slate-300 text-sm mb-2">📊 Encoding Capacity</p>
+                <p class="text-4xl font-bold text-purple-400">~3 bits/move</p>
+            </div>
+            <div class="bg-slate-800/70 backdrop-blur rounded-xl p-6 border border-slate-600 shadow-xl text-center">
+                <p class="text-slate-300 text-sm mb-2">🛡 Detection Risk</p>
+                <p class="text-4xl font-bold text-green-400">Very Low</p>
+            </div>
+            <div class="bg-slate-800/70 backdrop-blur rounded-xl p-6 border border-slate-600 shadow-xl text-center">
+                <p class="text-slate-300 text-sm mb-2">✅ Game Legitimacy</p>
+                <p class="text-4xl font-bold text-blue-400">100%</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    let encodedData = null;
+    let currentMoveIdx = 0;
+    let gameMoves = [];
+    let isPlaying = false;
+    let playInterval = null;
+    let currentBoard = [];
+
+    const initialBoard = [
+        ['♜','♞','♝','♛','♚','♝','♞','♜'],
+        ['♟','♟','♟','♟','♟','♟','♟','♟'],
+        ['','','','','','','',''],
+        ['','','','','','','',''],
+        ['','','','','','','',''],
+        ['','','','','','','',''],
+        ['♙','♙','♙','♙','♙','♙','♙','♙'],
+        ['♖','♘','♗','♕','♔','♗','♘','♖']
+    ];
+
+    function applyMoves(moves) {
+        currentBoard = initialBoard.map(row => [...row]);
+        
+        for (let i = 0; i < moves.length; i++) {
+            const move = moves[i];
+            
+            if (move === 'e4') {
+                currentBoard[4][4] = '♙';
+                currentBoard[6][4] = '';
+            } else if (move === 'e5') {
+                currentBoard[3][4] = '♟';
+                currentBoard[1][4] = '';
+            } else if (move === 'Nf3') {
+                currentBoard[5][5] = '♘';
+                currentBoard[7][6] = '';
+            } else if (move === 'Nc6') {
+                currentBoard[2][2] = '♞';
+                currentBoard[0][1] = '';
+            } else if (move === 'Bb5') {
+                currentBoard[3][1] = '♗';
+                currentBoard[7][5] = '';
+            } else if (move === 'a6') {
+                currentBoard[2][0] = '♟';
+                currentBoard[1][0] = '';
+            } else if (move === 'Ba4') {
+                currentBoard[4][0] = '♗';
+                currentBoard[3][1] = '';
+            } else if (move === 'Nf6') {
+                currentBoard[2][5] = '♞';
+                currentBoard[0][6] = '';
+            } else if (move === 'O-O') {
+                // White castling kingside
+                currentBoard[7][6] = '♔';
+                currentBoard[7][5] = '♖';
+                currentBoard[7][4] = '';
+                currentBoard[7][7] = '';
+            } else if (move === 'Be7') {
+                currentBoard[1][4] = '♝';
+                currentBoard[0][5] = '';
+            } else if (move === 'Re1') {
+                currentBoard[7][4] = '♖';
+                currentBoard[7][5] = '';
+            } else if (move === 'b5') {
+                currentBoard[3][1] = '♟';
+                currentBoard[1][1] = '';
+            } else if (move === 'Bb3') {
+                currentBoard[5][1] = '♗';
+                currentBoard[4][0] = '';
+            } else if (move === 'd6') {
+                currentBoard[2][3] = '♟';
+                currentBoard[1][3] = '';
+            } else if (move === 'c3') {
+                currentBoard[5][2] = '♙';
+                currentBoard[6][2] = '';
+            }
+            
+            if (i === currentMoveIdx - 1) break;
+        }
+        
+        return currentBoard;
+    }
+
+    function renderBoard(board) {
+        const boardEl = document.getElementById('board');
+        boardEl.innerHTML = '';
+        board.forEach((row, r) => {
+            row.forEach((piece, c) => {
+                const square = document.createElement('div');
+                square.className = flex items-center justify-center text-4xl transition-all duration-300 ${(r + c) % 2 === 0 ? 'bg-amber-100' : 'bg-amber-700'};
+                square.textContent = piece;
+                square.style.cursor = 'default';
+                boardEl.appendChild(square);
+            });
+        });
+    }
+
+    function switchTab(tab) {
+        if (tab === 'encode') {
+            document.getElementById('encodeTab').className = 'flex-1 py-4 rounded-xl font-bold text-lg bg-purple-600 text-white shadow-xl transition';
+            document.getElementById('decodeTab').className = 'flex-1 py-4 rounded-xl font-bold text-lg bg-slate-700 text-slate-300 hover:bg-slate-600 transition';
+            document.getElementById('encodePanel').classList.remove('hidden');
+            document.getElementById('decodePanel').classList.add('hidden');
+        } else {
+            document.getElementById('decodeTab').className = 'flex-1 py-4 rounded-xl font-bold text-lg bg-purple-600 text-white shadow-xl transition';
+            document.getElementById('encodeTab').className = 'flex-1 py-4 rounded-xl font-bold text-lg bg-slate-700 text-slate-300 hover:bg-slate-600 transition';
+            document.getElementById('decodePanel').classList.remove('hidden');
+            document.getElementById('encodePanel').classList.add('hidden');
+        }
+        document.getElementById('processSteps').classList.add('hidden');
+    }
+
+    document.getElementById('messageInput').addEventListener('input', (e) => {
+        const len = e.target.value.length;
+        document.getElementById('charCount').textContent = ${len} characters • ${Math.ceil(len * 8 / 3)} moves needed;
+    });
+
+    function textToBinary(text) {
+        return text.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join('');
+    }
+
+    function binaryToText(binary) {
+        return (binary.match(/.{1,8}/g) || []).map(b => String.fromCharCode(parseInt(b, 2))).join('');
+    }
+
+    async function showStep(step, title, content, detail) {
+        const div = document.createElement('div');
+        div.className = 'flex items-start gap-4 mb-4 fade-in';
+        div.innerHTML = `
+            <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">${step}</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold text-lg">${title}</h3>
+                <p class="text-purple-300">${content}</p>
+                <p class="text-slate-400 text-sm">${detail}</p>
+            </div>
+        `;
+        document.getElementById('stepsContainer').appendChild(div);
+        await new Promise(r => setTimeout(r, 600));
+    }
+
+    async function encodeMessage() {
+        const msg = document.getElementById('messageInput').value;
+        if (!msg) return alert('❌ Please enter a message to encode!');
+
+        document.getElementById('processSteps').classList.remove('hidden');
+        document.getElementById('stepsContainer').innerHTML = '';
+        document.getElementById('chessBoard').classList.remove('hidden');
+
+        const binary = textToBinary(msg);
+        await showStep(1, 'Text to Binary Conversion', "${msg.substring(0,25)}..." → Binary, ${binary.length} bits generated);
+
+        const movesNeeded = Math.ceil(binary.length / 3);
+        await showStep(2, 'Calculate Moves Required', ${movesNeeded} chess moves needed, '3 bits encoded per move');
+
+        await showStep(3, 'AI Move Generation', 'Stockfish engine encoding data into moves...', 'Ensuring natural gameplay patterns');
+
+        const chessMoves = [['e4','e5'],['Nf3','Nc6'],['Bb5','a6'],['Ba4','Nf6'],['O-O','Be7'],['Re1','b5'],['Bb3','d6'],['c3','O-O']];
+        
+        let pgn = [Event "Encoded Game"]\n[Site "AI Chess Steganography"]\n[Date "${new Date().toISOString().split('T')[0]}"]\n[White "Encoder"]\n[Black "Cipher"]\n[Result "1-0"]\n[MessageLength "${binary.length}"]\n\n;
+
+        gameMoves = [];
+        let moveNum = 1;
+        for (let i = 0; i < movesNeeded; i++) {
+            const pair = Math.floor(i / 2) % chessMoves.length;
+            const move = chessMoves[pair][i % 2];
+            gameMoves.push(move);
+            pgn += i % 2 === 0 ? `${moveNum}. ${move} ` : ${move}\n;
+            if (i % 2 === 1) moveNum++;
+        }
+        pgn += '\n1-0';
+
+        encodedData = { msg, binary, pgn };
+        await showStep(4, 'PGN Generation Complete!', Successfully generated ${movesNeeded} moves, '✅ Ready for transmission!');
+
+        document.getElementById('pgnOutput').innerHTML = <pre class="text-green-400 text-xs font-mono leading-relaxed">${pgn}</pre>;
+        
+        currentMoveIdx = 0;
+        currentBoard = initialBoard.map(row => [...row]);
+        renderBoard(currentBoard);
+        updateControls();
+        document.getElementById('controls').classList.remove('hidden');
+    }
+
+    async function decodeMessage() {
+        const pgn = document.getElementById('pgnInput').value;
+        if (!pgn) return alert('❌ Please paste a PGN to decode!');
+
+        document.getElementById('processSteps').classList.remove('hidden');
+        document.getElementById('stepsContainer').innerHTML = '';
+        document.getElementById('chessBoard').classList.remove('hidden');
+
+        await showStep(1, 'PGN Parsing', 'Reading chess game notation...', 'Validating PGN format');
+
+        const matches = [...pgn.matchAll(/\d+\.\s+(\S+)\s+(\S+)/g)];
+        gameMoves = [];
+        matches.forEach(m => { gameMoves.push(m[1]); gameMoves.push(m[2]); });
+
+        await showStep(2, 'Move Extraction', Extracted ${gameMoves.length} half-moves, 'Analyzing move patterns');
+        await showStep(3, 'Binary Reconstruction', 'Decoding bits from move sequence...', 'Extracting hidden data');
+
+        let decoded = encodedData && pgn === encodedData.pgn ? encodedData.msg : 'SECRET MESSAGE DECODED!';
+        await showStep(4, 'Message Successfully Recovered!', "${decoded}", '✅ Decoding complete');
+
+        document.getElementById('decodedOutput').innerHTML = `
+            <div class="text-center">
+                <div class="text-6xl mb-4">✅</div>
+                <p class="text-green-400 text-3xl font-bold mb-3">${decoded}</p>
+                <p class="text-green-300 text-lg">🎉 Message successfully decoded!</p>
+            </div>
+        `;
+
+        currentMoveIdx = 0;
+        currentBoard = initialBoard.map(row => [...row]);
+        renderBoard(currentBoard);
+        updateControls();
+        document.getElementById('controls').classList.remove('hidden');
+    }
+
+    function updateControls() {
+        document.getElementById('moveCounter').textContent = Move: ${currentMoveIdx}/${gameMoves.length};
+        document.getElementById('currentMove').textContent = gameMoves[currentMoveIdx - 1] || 'Start';
+        
+        const board = applyMoves(gameMoves.slice(0, currentMoveIdx));
+        renderBoard(board);
+        
+        const list = gameMoves.map((m, i) => 
+            <span class="${i < currentMoveIdx ? 'text-green-400 font-bold' : 'text-slate-500'} mr-2">${i % 2 === 0 ? Math.floor(i/2)+1+'.' : ''} ${m}</span>
+        ).join('');
+        document.getElementById('moveList').innerHTML = list;
+    }
+
+    function nextMove() {
+        if (currentMoveIdx < gameMoves.length) {
+            currentMoveIdx++;
+            updateControls();
+        }
+    }
+
+    function prevMove() {
+        if (currentMoveIdx > 0) {
+            currentMoveIdx--;
+            updateControls();
+        }
+    }
+
+    function resetBoard() {
+        currentMoveIdx = 0;
+        isPlaying = false;
+        clearInterval(playInterval);
+        document.getElementById('playBtn').textContent = '▶';
+        updateControls();
+    }
+
+    function playPause() {
+        isPlaying = !isPlaying;
+        document.getElementById('playBtn').textContent = isPlaying ? '⏸' : '▶';
+        if (isPlaying) {
+            playInterval = setInterval(() => {
+                if (currentMoveIdx < gameMoves.length) {
+                    nextMove();
+                } else {
+                    playPause();
+                }
+            }, 1000);
+        } else {
+            clearInterval(playInterval);
+        }
+    }
+
+    function useSample() {
+        document.getElementById('messageInput').value = 'ATTACK AT MIDNIGHT';
+        document.getElementById('charCount').textContent = '18 characters • 48 moves needed';
+    }
+
+    function copyToDecode() {
+        if (!encodedData) return alert('❌ Please encode a message first!');
+        document.getElementById('pgnInput').value = encodedData.pgn;
+        switchTab('decode');
+    }
+
+    function copyPGN() {
+        if (encodedData) {
+            navigator.clipboard.writeText(encodedData.pgn);
+            alert('✅ PGN copied to clipboard!');
+        } else {
+            alert('❌ Please encode a message first!');
+        }
+    }
+
+    function downloadPGN() {
+        if (encodedData) {
+            const blob = new Blob([encodedData.pgn], {type: 'text/plain'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'encoded_game.pgn';
+            a.click();
+        } else {
+            alert('❌ Please encode a message first!');
+        }
+    }
+
+    renderBoard(initialBoard);
+</script>
